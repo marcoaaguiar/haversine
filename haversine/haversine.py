@@ -1,8 +1,10 @@
 from enum import Enum
 from math import pi
-from typing import Union, Tuple
+from typing import Union, Tuple, TYPE_CHECKING
 import math
 
+if TYPE_CHECKING:
+    import numpy
 
 # mean earth radius - https://en.wikipedia.org/wiki/Earth_radius#Mean_radius
 _AVG_EARTH_RADIUS_KM = 6371.0088
@@ -56,7 +58,7 @@ _CONVERSIONS = {
 }
 
 
-def get_avg_earth_radius(unit):
+def get_avg_earth_radius(unit: Unit) -> float:
     return _AVG_EARTH_RADIUS_KM * _CONVERSIONS[unit]
 
 
@@ -180,7 +182,7 @@ except ModuleNotFoundError:
     pass
 
 
-def haversine(point1, point2, unit=Unit.KILOMETERS, normalize=False, check=True):
+def haversine(point1: Tuple[float, float], point2: Tuple[float, float], unit: Union[Unit, str] = Unit.KILOMETERS, normalize: bool = False, check: bool = True) -> float:
     """ Calculate the great-circle distance between two points on the Earth surface.
 
     Takes two 2-tuples, containing the latitude and longitude of each point in decimal degrees,
@@ -221,7 +223,7 @@ def haversine(point1, point2, unit=Unit.KILOMETERS, normalize=False, check=True)
     return get_avg_earth_radius(unit) * _haversine_kernel(lat1, lng1, lat2, lng2)
 
 
-def haversine_vector(array1, array2, unit=Unit.KILOMETERS, comb=False, normalize=False, check=True):
+def haversine_vector(array1: Union[Iterable[Tuple[float, float]], "numpy.ndarray"], array2: Union[Iterable[Tuple[float, float]], "numpy.ndarray"], unit: Union[Unit, str] = Unit.KILOMETERS, comb: bool = False, normalize: bool = False, check: bool = True) -> "numpy.ndarray":
     '''
     The exact same function as "haversine", except that this
     version replaces math functions with numpy functions.
@@ -273,7 +275,7 @@ def haversine_vector(array1, array2, unit=Unit.KILOMETERS, comb=False, normalize
     return get_avg_earth_radius(unit) * _haversine_kernel_vector(lat1, lng1, lat2, lng2)
 
 
-def inverse_haversine(point, distance, direction: Union[Direction, float], unit=Unit.KILOMETERS, normalize_output=False):
+def inverse_haversine(point: Tuple[float, float], distance: float, direction: Union[Direction, float], unit: Union[Unit, str] = Unit.KILOMETERS, normalize_output: bool = False) -> Tuple[float, float]:
     lat, lng = point
     r = get_avg_earth_radius(unit)
     outLat, outLng = _inverse_haversine_kernel(lat, lng, direction, distance / r)
